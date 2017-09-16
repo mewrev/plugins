@@ -16,7 +16,7 @@ void dump_cfgs() {
 	int nfuncs = get_func_qty();
 	for (int i = 0; i < nfuncs; i++) {
 		func_t *f = getn_func(i);
-		ea_t faddr = f->startEA;
+		ea_t faddr = f->start_ea;
 		char title[32];
 		qsnprintf(title, sizeof(title), "%08X", faddr);
 		char dst_path[1024];
@@ -33,8 +33,9 @@ int idaapi init(void) {
 	return PLUGIN_OK;
 }
 
-void idaapi run(int) {
+bool idaapi run(size_t) {
 	dump_cfgs();
+	return true;
 }
 
 plugin_t PLUGIN = {
