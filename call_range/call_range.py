@@ -14,33 +14,31 @@ XREF_TYPE2STR = {idaapi.fl_U : "User Defined",
 
 ALL_XREFS = 0
 
-# find_callees returns the callees of the given function (i.e. the outgoing
-# cross-references).
-def find_callees(func_ea):
-	callers = []
-	items = idautils.FuncItems(func_ea)
-	for item in items:
+# find_xrefs_out returns the outgoing cross-references of the given function
+# (i.e. the callees).
+def find_xrefs_out(func_ea):
+	xrefs = []
+	for item in idautils.FuncItems(func_ea):
 		for ref in idautils.XrefsFrom(item, ALL_XREFS):
 			if ref.type not in XREF_TYPE2STR:
 				continue
-			if ref.to in items:
+			if ref.to in idautils.FuncItems(func_ea):
 				continue
-			callers.append(ref.to)
-	return callers
+			xrefs.append(ref.to)
+	return xrefs
 
-# find_callers returns the callers of the given function (i.e. the incoming
-# cross-references).
-def find_callers(func_ea):
-	callees = []
-	items = idautils.FuncItems(func_ea)
-	for item in items:
+# find_xrefs_in returns the incoming cross-references of the given function
+# (i.e. the callers).
+def find_xrefs_in(func_ea):
+	xrefs = []
+	for item in idautils.FuncItems(func_ea):
 		for ref in idautils.XrefsTo(item, ALL_XREFS):
 			if ref.type not in XREF_TYPE2STR:
 				continue
-			if ref.frm in items:
+			if ref.frm in idautils.FuncItems(func_ea):
 				continue
-			callees.append(ref.frm)
-	return callees
+			xrefs.append(ref.frm)
+	return xrefs
 
 # name_from_ea returns the name associated with the given address.
 def name_from_ea(ea):
@@ -69,8 +67,8 @@ def gen_dot_graph(first_ea, last_ea):
 	ea = BeginEA()
 	for from_ea in Functions(SegStart(ea), SegEnd(ea)):
 		from_name = GetFunctionName(from_ea)
-		callees = find_callees(from_ea)
-		for to_ea in callees:
+		to_eas = find_xrefs_out(from_ea)
+		for to_ea in to_eas:
 			if not in_range(from_ea) and not in_range(to_ea):
 				# Skip edge if neither the from nor the to node is within the
 				# address range.
@@ -86,7 +84,6 @@ def gen_dot_graph(first_ea, last_ea):
 				out_nodes[to_name] = True
 			edge = (from_name, to_name)
 			edges.append(edge)
-	#with tempfile.NamedTemporaryFile(prefix="callgraph_", suffix=".dot") as f:
 	with open('/tmp/call_range_%06X-%06X.dot' % (first_ea, last_ea), 'w') as f:
 		f.write('digraph {\n')
 		for i in in_nodes:
