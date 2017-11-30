@@ -63,7 +63,7 @@ def gen_dot_graph(first_ea, last_ea):
 	in_nodes = {}
 	# Nodes outside the address range.
 	out_nodes = {}
-	edges = []
+	edges = {}
 	ea = BeginEA()
 	for from_ea in Functions(SegStart(ea), SegEnd(ea)):
 		from_name = GetFunctionName(from_ea)
@@ -83,7 +83,7 @@ def gen_dot_graph(first_ea, last_ea):
 			else:
 				out_nodes[to_name] = True
 			edge = (from_name, to_name)
-			edges.append(edge)
+			edges[edge] = True
 	with open('/tmp/call_range_%06X-%06X.dot' % (first_ea, last_ea), 'w') as f:
 		f.write('digraph {\n')
 		for i in in_nodes:
