@@ -95,6 +95,7 @@ def gen_dot_graph(first_ea, last_ea):
 			f.write('\t"%s" -> "%s"\n' % (from_name, to_name))
 		f.write("}")
 		print('Call graph stored at "%s"' % f.name)
+		return f.name
 
 first = AskAddr(0, "First function address in range.")
 last = AskAddr(0, "Last function address in range.")
