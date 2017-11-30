@@ -84,7 +84,7 @@ def gen_dot_graph(first_ea, last_ea):
 				out_nodes[to_name] = True
 			edge = (from_name, to_name)
 			edges[edge] = True
-	with open('/tmp/call_range_%06X-%06X.dot' % (first_ea, last_ea), 'w') as f:
+	with open('/tmp/range_%06X-%06X.dot' % (first_ea, last_ea), 'w') as f:
 		f.write('digraph {\n')
 		for i in in_nodes:
 			f.write('\t"%s" [fillcolor=lightblue style=filled]\n' % i)
