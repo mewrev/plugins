@@ -4,7 +4,7 @@ Colour assigns a colour to the selected function.
 
 ## Hotkey
 
-To add a hotkey for the colour plugin, modify `ida/idc/ida.idc` as follows:
+To add a hotkey for the colour script, modify `ida/idc/ida.idc` as follows:
 
 ```diff
 diff --git a/ida.idc b/ida.idc
