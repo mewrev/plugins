@@ -64,26 +64,30 @@ def gen_dot_graph(first_ea, last_ea):
 	# Nodes outside the address range.
 	out_nodes = {}
 	edges = {}
-	ea = BeginEA()
-	for from_ea in Functions(SegStart(ea), SegEnd(ea)):
-		from_name = GetFunctionName(from_ea)
-		to_eas = find_xrefs_out(from_ea)
-		for to_ea in to_eas:
-			if not in_range(from_ea) and not in_range(to_ea):
-				# Skip edge if neither the from nor the to node is within the
-				# address range.
-				continue
-			to_name = name_from_ea(to_ea)
-			if in_range(from_ea):
-				in_nodes[from_name] = True
-			else:
-				out_nodes[from_name] = True
-			if in_range(to_ea):
-				in_nodes[to_name] = True
-			else:
-				out_nodes[to_name] = True
-			edge = (from_name, to_name)
-			edges[edge] = True
+	for seg in idautils.Segments():
+		# Skip extern segment; as used by IDA for external functions.
+		if idc.get_segm_attr(seg, SEGATTR_TYPE) == idc.SEG_XTRN:
+			#print("skipping segment ", idc.get_segm_name(seg))
+			continue
+		for from_ea in idautils.Functions(seg, SegEnd(seg)):
+			from_name = GetFunctionName(from_ea)
+			to_eas = find_xrefs_out(from_ea)
+			for to_ea in to_eas:
+				if not in_range(from_ea) and not in_range(to_ea):
+					# Skip edge if neither the from nor the to node is within the
+					# address range.
+					continue
+				to_name = name_from_ea(to_ea)
+				if in_range(from_ea):
+					in_nodes[from_name] = True
+				else:
+					out_nodes[from_name] = True
+				if in_range(to_ea):
+					in_nodes[to_name] = True
+				else:
+					out_nodes[to_name] = True
+				edge = (from_name, to_name)
+				edges[edge] = True
 	with open('/tmp/range_%06X-%06X.dot' % (first_ea, last_ea), 'w') as f:
 		f.write('digraph {\n')
 		for i in in_nodes:
